@@ -9,7 +9,6 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const client = Telegram.TelegramClient.connect(TELEGRAM_BOT_TOKEN);
 let knownShows = {};
 let newShows = [];
-const CHECK_INTERVAL = 3 * 60 * 1000;
 const knownShowsBackupFile = './lib/known-shows.json';
 const lodashCdnUrl =
   'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js';
@@ -17,7 +16,7 @@ const lodashCdnUrl =
 if (!TELEGRAM_BOT_TOKEN) {process.exit(1);}
 
 restoreKnownShows()
-  .then(() => setInterval(exec, CHECK_INTERVAL));
+  .then(exec);
 
 function exec() {
   return getCurrentShows()
