@@ -1,0 +1,19 @@
+{
+  "name": "comedian_tickets_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-modules index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ZimGil",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.19.1",
+    "lodash": "^4.17.15",
+    "messaging-api-telegram": "^0.8.2",
+    "puppeteer": "^2.0.0"
+  }
+}
