@@ -5,10 +5,12 @@ import puppetter from 'puppeteer';
 import Telegram from 'messaging-api-telegram';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const GILS_CHAT_ID = '';
 
 const client = Telegram.TelegramClient.connect(TELEGRAM_BOT_TOKEN);
 let knownShows = {};
 let newShows = [];
+const CHECK_INTERVAL = 3 * 60 * 1000;
 const knownShowsBackupFile = './lib/known-shows.json';
 const lodashCdnUrl =
   'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js';
@@ -16,6 +18,7 @@ const lodashCdnUrl =
 if (!TELEGRAM_BOT_TOKEN) {process.exit(1);}
 
 restoreKnownShows()
+  // .then(() => setInterval(exec, CHECK_INTERVAL))
   .then(exec);
 
 function exec() {
@@ -23,7 +26,6 @@ function exec() {
     .then(getNewShows)
     .then((_newShows) => newShows = _newShows)
     .then(backupKnownShows)
-    .then(getSubscribers)
     .then(notifyNewShows);
 }
 
@@ -75,18 +77,7 @@ function backupKnownShows() {
   return fs.writeFile(knownShowsBackupFile, JSON.stringify(knownShows));
 }
 
-function getSubscribers() {
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates`;
-  return axios.get(url)
-    .then((res) => {
-      return _.chain(res.data.result)
-        .map((update) => update.message.chat.id)
-        .uniq()
-        .value();
-    });
-}
-
-function notifyNewShows(chatIds) {
+function notifyNewShows() {
   return new Promise((resolve) => {
     promiseForEach(newShows, (show, index) => {
       let msg = [
@@ -100,20 +91,11 @@ function notifyNewShows(chatIds) {
       return axios.get(tinyUrl)
         .then((link) => msg += `\nקישור: ${link.data}`)
         .catch(() => msg += '\nהכרטיסים אזלו')
-        .then(() => sendMsgToSubscribers(chatIds, msg))
+        .then(() => client.sendMessage(GILS_CHAT_ID, msg))
         .then(() => index === newShows.length && resolve());
     });
   });
 }
-
-function sendMsgToSubscribers(chatIds, msg) {
-  return new Promise((resolve) => {
-    promiseForEach(chatIds, (id, index) => {
-      return client.sendMessage(id, msg)
-        .then(() => index === chatIds.length && resolve());
-    });
-  });
-};
 
 function promiseForEach(arr, callback) {
   let i = 0;
