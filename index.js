@@ -3,6 +3,7 @@ import {reduce} from 'lodash';
 import axios from 'axios';
 import puppetter from 'puppeteer';
 import Telegram from 'messaging-api-telegram';
+import cron from 'node-cron';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHAT_ID = process.env.CHAT_ID;
@@ -16,10 +17,13 @@ const lodashCdnUrl =
 
 if (!TELEGRAM_BOT_TOKEN) {process.exit(1);}
 
-restoreKnownShows()
-  // .then(() => setInterval(exec, CHECK_INTERVAL))
-  .then(exec)
-  .catch(console.error);
+cron.schedule('* * * * *', run);
+
+function run() {
+  return restoreKnownShows()
+    .then(exec)
+    .catch(console.error);
+}
 
 function exec() {
   return getCurrentShows()
