@@ -33,7 +33,7 @@ function getCurrentShows() {
   let browser;
   let page;
 
-  return puppetter.launch()
+  return puppetter.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
     .then((_browser) => browser = _browser)
     .then(() => browser.newPage())
     .then((_page) => page = _page)
