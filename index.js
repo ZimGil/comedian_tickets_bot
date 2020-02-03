@@ -30,7 +30,8 @@ function exec() {
     .then(getNewShows)
     .then((_newShows) => newShows = _newShows)
     .then(backupKnownShows)
-    .then(notifyNewShows);
+    .then(notifyNewShows)
+    .then(() => console.log(Date.now()));
 }
 
 function getCurrentShows() {
