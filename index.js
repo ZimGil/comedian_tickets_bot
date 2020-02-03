@@ -1,5 +1,5 @@
 import {promises as fs} from 'fs';
-import _ from 'lodash';
+import {reduce} from 'lodash';
 import axios from 'axios';
 import puppetter from 'puppeteer';
 import Telegram from 'messaging-api-telegram';
@@ -57,7 +57,7 @@ function getCurrentShows() {
 }
 
 function getNewShows(currentShows) {
-  return _.reduce(currentShows, (newShows, show, showDate) => {
+  return reduce(currentShows, (newShows, show, showDate) => {
     if (knownShows[showDate]) {return newShows;}
     newShows.push(show);
     knownShows[showDate] = show;
