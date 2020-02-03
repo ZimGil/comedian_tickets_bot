@@ -5,12 +5,11 @@ import puppetter from 'puppeteer';
 import Telegram from 'messaging-api-telegram';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const GILS_CHAT_ID = '';
+const CHAT_ID = process.env.CHAT_ID;
 
 const client = Telegram.TelegramClient.connect(TELEGRAM_BOT_TOKEN);
 let knownShows = {};
 let newShows = [];
-const CHECK_INTERVAL = 3 * 60 * 1000;
 const knownShowsBackupFile = './lib/known-shows.json';
 const lodashCdnUrl =
   'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js';
@@ -91,7 +90,7 @@ function notifyNewShows() {
       return axios.get(tinyUrl)
         .then((link) => msg += `\nקישור: ${link.data}`)
         .catch(() => msg += '\nהכרטיסים אזלו')
-        .then(() => client.sendMessage(GILS_CHAT_ID, msg))
+        .then(() => client.sendMessage(CHAT_ID, msg))
         .then(() => index === newShows.length && resolve());
     });
   });
