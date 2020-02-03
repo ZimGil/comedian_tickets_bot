@@ -18,7 +18,8 @@ if (!TELEGRAM_BOT_TOKEN) {process.exit(1);}
 
 restoreKnownShows()
   // .then(() => setInterval(exec, CHECK_INTERVAL))
-  .then(exec);
+  .then(exec)
+  .catch(console.error);
 
 function exec() {
   return getCurrentShows()
@@ -53,6 +54,7 @@ function getCurrentShows() {
         return shows;
       }, {});
     }))
+    .catch(console.log)
     .finally(() => browser.close());
 }
 
