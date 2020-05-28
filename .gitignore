@@ -1,3 +1,6 @@
+# Ignore known shows
+lib
+
 # Logs
 logs
 *.log
