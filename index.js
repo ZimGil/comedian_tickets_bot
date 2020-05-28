@@ -6,7 +6,7 @@ import Telegram from 'messaging-api-telegram';
 import cron from 'node-cron';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const CHAT_ID = process.env.CHAT_ID;
+const CHAT_ID = process.env.GILS_CHAT_ID;
 
 const client = Telegram.TelegramClient.connect(TELEGRAM_BOT_TOKEN);
 let knownShows = {};
@@ -98,7 +98,7 @@ function notifyNewShows() {
         .then((link) => msg += `\nקישור: ${link.data}`)
         .catch(() => msg += '\nהכרטיסים אזלו')
         .then(() => client.sendMessage(CHAT_ID, msg))
-        .then(() => index === newShows.length && resolve());
+        .then(() => (index === (newShows.length -1)) && resolve());
     });
   });
 }
