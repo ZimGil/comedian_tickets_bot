@@ -1,9 +1,10 @@
 import {promises as fs} from 'fs';
-import {reduce} from 'lodash';
+import { reduce, isEmpty } from 'lodash';
 import axios from 'axios';
 import puppetter from 'puppeteer';
 import Telegram from 'messaging-api-telegram';
 import cron from 'node-cron';
+import logger from './logger.js';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHAT_ID = process.env.GILS_CHAT_ID;
@@ -22,22 +23,25 @@ cron.schedule('* * * * *', run);
 function run() {
   return restoreKnownShows()
     .then(exec)
-    .catch(console.error);
+    .catch(logger.error);
 }
 
 function exec() {
   return getCurrentShows()
     .then(getNewShows)
-    .then((_newShows) => newShows = _newShows)
+    .then((_newShows) => {
+      newShows = _newShows;
+      newShows.length && logger.info('New shows', newShows);
+    })
     .then(backupKnownShows)
     .then(notifyNewShows)
-    .then(() => console.log(Date.now()));
 }
 
 function getCurrentShows() {
   let browser;
   let page;
 
+  logger.debug('Getting current shows');
   return puppetter.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
     .then((_browser) => browser = _browser)
     .then(() => browser.newPage())
@@ -59,7 +63,7 @@ function getCurrentShows() {
         return shows;
       }, {});
     }))
-    .catch(console.log)
+    .catch(logger.error)
     .finally(() => browser.close());
 }
 
@@ -76,7 +80,8 @@ function restoreKnownShows() {
   return fs.readFile(knownShowsBackupFile)
     .then(JSON.parse)
     .then((_knownShows) => knownShows = _knownShows)
-    .catch(console.error);
+    .then(() => logger.info('Restored known shows from file'))
+    .catch(logger.error);
 }
 
 function backupKnownShows() {
