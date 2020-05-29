@@ -1,4 +1,5 @@
-import {promises as fs} from 'fs';
+import os from 'os';
+import { promises as fs } from 'fs';
 import { reduce, isEmpty } from 'lodash';
 import axios from 'axios';
 import puppetter from 'puppeteer';
@@ -12,9 +13,15 @@ const CHAT_ID = process.env.GILS_CHAT_ID;
 const client = Telegram.TelegramClient.connect(TELEGRAM_BOT_TOKEN);
 let knownShows = {};
 let newShows = [];
+const browserOptions = {
+  headless: true,
+  args: ['--no-sandbox', '--disable-setuid-sandbox']
+};
+if (os.arch().includes('arm')) {
+  browserOptions.executablePath = 'chromium-browser';
+}
 const knownShowsBackupFile = './lib/known-shows.json';
-const lodashCdnUrl =
-  'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js';
+const lodashCdnUrl = 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js';
 
 if (!TELEGRAM_BOT_TOKEN) {process.exit(1);}
 
@@ -23,7 +30,7 @@ cron.schedule('* * * * *', run);
 function run() {
   return restoreKnownShows()
     .then(exec)
-    .catch(logger.error);
+    .catch((e) => logger.error(e));
 }
 
 function exec() {
@@ -42,7 +49,7 @@ function getCurrentShows() {
   let page;
 
   logger.debug('Getting current shows');
-  return puppetter.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
+  return puppetter.launch(browserOptions)
     .then((_browser) => browser = _browser)
     .then(() => browser.newPage())
     .then((_page) => page = _page)
@@ -63,7 +70,7 @@ function getCurrentShows() {
         return shows;
       }, {});
     }))
-    .catch(logger.error)
+    .catch((e) => logger.error(e))
     .finally(() => browser.close());
 }
 
@@ -81,7 +88,7 @@ function restoreKnownShows() {
     .then(JSON.parse)
     .then((_knownShows) => knownShows = _knownShows)
     .then(() => logger.info('Restored known shows from file'))
-    .catch(logger.error);
+    .catch((e) => logger.error(e));
 }
 
 function backupKnownShows() {
