@@ -1,7 +1,6 @@
 import os from 'os';
 import { promises as fs } from 'fs';
-import { reduce, isEmpty } from 'lodash';
-import axios from 'axios';
+import { reduce } from 'lodash';
 import puppetter from 'puppeteer';
 import Telegram from 'messaging-api-telegram';
 import cron from 'node-cron';
@@ -103,13 +102,10 @@ function notifyNewShows() {
         `תאריך: ${show.date}`,
         `יום: ${show.day}`,
         `שעה: ${show.time}`,
-        `מקום: ${show.location}`
+        `מקום: ${show.location}`,
+        `[הזמנת כרטיסים](${show.link})`
       ].join('\n');
-      const tinyUrl = `http://tinyurl.com/api-create.php?url=${show.link}`;
-      return axios.get(tinyUrl)
-        .then((link) => msg += `\nקישור: ${link.data}`)
-        .catch(() => msg += '\nהכרטיסים אזלו')
-        .then(() => client.sendMessage(CHAT_ID, msg))
+      return client.sendMessage(CHAT_ID, msg, {parse_mode: 'MarkdownV2'})
         .then(() => (index === (newShows.length -1)) && resolve());
     });
   });
