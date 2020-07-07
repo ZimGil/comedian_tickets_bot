@@ -52,7 +52,7 @@ function getCurrentShows() {
     .then(() => page.evaluate(() => {
       const tableRows = document.querySelectorAll('.show_appearances_list tr');
       return _.reduce(tableRows, (shows, tr) => {
-        if (tr.rowIndex <= 2 || tr.rowIndex % 2) {return shows;}
+        if (tr.rowIndex === 0 || tr.rowIndex % 2) {return shows;}
         const showDate = tr.cells[0].innerText;
         shows[showDate] = {
           date: showDate,
