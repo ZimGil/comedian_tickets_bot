@@ -6,8 +6,7 @@ import Telegram from 'messaging-api-telegram';
 import cron from 'node-cron';
 import logger from './logger.js';
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const CHAT_ID = process.env.GILS_CHAT_ID;
+const { TELEGRAM_BOT_TOKEN ,CHAT_ID, NODE_ENV } = process.env;
 
 const client = Telegram.TelegramClient.connect(TELEGRAM_BOT_TOKEN);
 let knownShows = {};
@@ -24,23 +23,19 @@ const lodashCdnUrl = 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/l
 
 if (!TELEGRAM_BOT_TOKEN) {process.exit(1);}
 
-cron.schedule('* * * * *', run);
+restoreKnownShows()
+  .then(() => cron.schedule('* * * * *', run));
 
 function run() {
-  return restoreKnownShows()
-    .then(exec)
-    .catch((e) => logger.error(e));
-}
-
-function exec() {
   return getCurrentShows()
     .then(getNewShows)
     .then((_newShows) => {
       newShows = _newShows;
       newShows.length && logger.info('New shows', newShows);
     })
-    .then(backupKnownShows)
+    .then(() => NODE_ENV !== 'development' && backupKnownShows)
     .then(notifyNewShows)
+    .catch((e) => logger.error(e));
 }
 
 function getCurrentShows() {
