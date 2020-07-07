@@ -92,21 +92,25 @@ function backupKnownShows() {
 function notifyNewShows() {
   return new Promise((resolve) => {
     promiseForEach(newShows, (show, index) => {
-      let msg = [
-        'הופעה חדשה של שחר חסון',
-        `תאריך: ${show.date}`,
-        `יום: ${show.day}`,
-        `שעה: ${show.time}`,
-        `מקום: ${escapeReservedChars(show.location)}`,
-        `[הזמנת כרטיסים](${show.link})`
-      ].join('\n');
-      return client.sendMessage(CHAT_ID, msg, {parse_mode: 'MarkdownV2'})
+      return client.sendMessage(CHAT_ID, getShowMessage(show), {parse_mode: 'MarkdownV2'})
         .then(() => (index === (newShows.length -1)) && resolve());
     });
   });
 }
 
+function getShowMessage({date, day, time, location, link}) {
+  return [
+    'הופעה חדשה של שחר חסון',
+    `תאריך: ${date}`,
+    `יום: ${day}`,
+    `שעה: ${time}`,
+    `מקום: ${escapeReservedChars(location)}`,
+    `[הזמנת כרטיסים](${link})`
+  ].join('\n');
+}
+
 function escapeReservedChars(str) {
+  // https://core.telegram.org/bots/api#markdownv2-style
   return str.replace(/[_\*\[\]\(\)~`>#+-=|{}\.!]/g, (s) => `\\${s}`);
 }
 
