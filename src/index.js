@@ -97,13 +97,17 @@ function notifyNewShows() {
         `תאריך: ${show.date}`,
         `יום: ${show.day}`,
         `שעה: ${show.time}`,
-        `מקום: ${show.location}`,
+        `מקום: ${escapeReservedChars(show.location)}`,
         `[הזמנת כרטיסים](${show.link})`
       ].join('\n');
       return client.sendMessage(CHAT_ID, msg, {parse_mode: 'MarkdownV2'})
         .then(() => (index === (newShows.length -1)) && resolve());
     });
   });
+}
+
+function escapeReservedChars(str) {
+  return str.replace(/[_\*\[\]\(\)~`>#+-=|{}\.!]/g, (s) => `\\${s}`);
 }
 
 function promiseForEach(arr, callback) {
