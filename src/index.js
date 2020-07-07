@@ -90,12 +90,11 @@ function backupKnownShows() {
 }
 
 function notifyNewShows() {
-  return new Promise((resolve) => {
-    promiseForEach(newShows, (show, index) => {
-      return client.sendMessage(CHAT_ID, getShowMessage(show), {parse_mode: 'MarkdownV2'})
-        .then(() => (index === (newShows.length -1)) && resolve());
-    });
-  });
+    return promiseForEach(newShows, sendMessage);
+}
+
+function sendMessage(show) {
+  return client.sendMessage(CHAT_ID, getShowMessage(show), {parse_mode: 'MarkdownV2'});
 }
 
 function getShowMessage({date, day, time, location, link}) {
