@@ -1,5 +1,5 @@
 # Ignore known shows
-lib
+lib/
 
 # Logs
 logs
