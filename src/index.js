@@ -59,7 +59,8 @@ function getCurrentShows() {
           day: tr.cells[2].innerText,
           location: tr.cells[4].innerText,
           time: tr.cells[6].innerText,
-          link: tr.cells[8].children[0].href
+          link: tr.cells[8].children[0].href,
+          linkText: tr.cells[8].children[0].innerText
         };
         return shows;
       }, {});
@@ -97,15 +98,22 @@ function sendMessage(show) {
   return client.sendMessage(CHAT_ID, getShowMessage(show), {parse_mode: 'MarkdownV2'});
 }
 
-function getShowMessage({date, day, time, location, link}) {
-  return [
+function getShowMessage({date, day, time, location, link, linkText}) {
+  const linkStr = link && link.includes('http')
+    ? `[הזמנת כרטיסים](${link})`
+    : linkText;
+
+  const msg =  [
     'הופעה חדשה של שחר חסון',
     `תאריך: ${date}`,
     `יום: ${day}`,
     `שעה: ${time}`,
     `מקום: ${escapeReservedChars(location)}`,
-    `[הזמנת כרטיסים](${link})`
-  ].join('\n');
+    linkStr
+  ];
+
+
+  return msg.join('\n');
 }
 
 function escapeReservedChars(str) {
