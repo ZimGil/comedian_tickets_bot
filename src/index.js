@@ -33,7 +33,7 @@ function run() {
       newShows = _newShows;
       newShows.length && logger.info('New shows', newShows);
     })
-    .then(() => NODE_ENV !== 'development' && backupKnownShows)
+    .then(() => NODE_ENV !== 'development' && backupKnownShows())
     .then(notifyNewShows)
     .catch((e) => logger.error(e));
 }
