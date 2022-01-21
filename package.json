@@ -13,7 +13,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "lodash": "^4.17.21",
-    "log4js": "^6.3.0",
+    "log4js": "^6.4.0",
     "messaging-api-telegram": "^0.8.2",
     "node-cron": "^2.0.3",
     "puppeteer": "^2.1.1"
